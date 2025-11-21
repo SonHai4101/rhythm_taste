@@ -56,7 +56,7 @@ const app = new Elysia()
     tags: ["Health"],
   })
   .group("/api", (app) => app.use(authPlugin).use(uploadAudioPlugin))
-  .listen(3000);
+  .listen(8080);
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
