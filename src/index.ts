@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 
 import { swagger } from "@elysiajs/swagger";
 import { authPlugin } from "./plugin/authPlugin";
+import { uploadAudioPlugin } from "./plugin/uploadAudioPlugin";
 
 const app = new Elysia()
   .use(
@@ -19,12 +20,16 @@ const app = new Elysia()
         },
         tags: [
           {
-            name: "health",
+            name: "Health",
             description: "Health Checkpoint",
           },
           {
             name: "Auth",
             description: "Authentication endpoints",
+          },
+          {
+            name: "Audio",
+            description: "Upload audio endpoints",
           },
         ],
         components: {
@@ -48,9 +53,9 @@ const app = new Elysia()
     })
   )
   .get("/health", () => "OK, working gud!", {
-    tags: ["health"],
+    tags: ["Health"],
   })
-  .group("/api", (app) => app.use(authPlugin))
+  .group("/api", (app) => app.use(authPlugin).use(uploadAudioPlugin))
   .listen(3000);
 
 console.log(

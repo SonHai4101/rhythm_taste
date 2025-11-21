@@ -4,44 +4,82 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const UserPlain = t.Object(
+export const AudioPlain = t.Object(
   {
-    id: t.Integer(),
-    username: t.String(),
-    email: t.String(),
-    password: t.String(),
+    id: t.String(),
+    url: t.String(),
+    songId: t.String(),
     createdAt: t.Date(),
     updatedAt: t.Date(),
   },
   { additionalProperties: false },
 );
 
-export const UserRelations = t.Object({}, { additionalProperties: false });
-
-export const UserPlainInputCreate = t.Object(
-  { username: t.String(), email: t.String(), password: t.String() },
-  { additionalProperties: false },
-);
-
-export const UserPlainInputUpdate = t.Object(
+export const AudioRelations = t.Object(
   {
-    username: t.Optional(t.String()),
-    email: t.Optional(t.String()),
-    password: t.Optional(t.String()),
+    song: t.Object(
+      {
+        id: t.String(),
+        title: t.String(),
+        artist: __nullable__(t.String()),
+        album: __nullable__(t.String()),
+        duration: __nullable__(t.Integer()),
+        createdAt: t.Date(),
+        updatedAt: t.Date(),
+      },
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
 
-export const UserRelationsInputCreate = t.Object(
-  {},
+export const AudioPlainInputCreate = t.Object(
+  { url: t.String() },
   { additionalProperties: false },
 );
 
-export const UserRelationsInputUpdate = t.Partial(
-  t.Object({}, { additionalProperties: false }),
+export const AudioPlainInputUpdate = t.Object(
+  { url: t.Optional(t.String()) },
+  { additionalProperties: false },
 );
 
-export const UserWhere = t.Partial(
+export const AudioRelationsInputCreate = t.Object(
+  {
+    song: t.Object(
+      {
+        connect: t.Object(
+          {
+            id: t.String({ additionalProperties: false }),
+          },
+          { additionalProperties: false },
+        ),
+      },
+      { additionalProperties: false },
+    ),
+  },
+  { additionalProperties: false },
+);
+
+export const AudioRelationsInputUpdate = t.Partial(
+  t.Object(
+    {
+      song: t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.String({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    },
+    { additionalProperties: false },
+  ),
+);
+
+export const AudioWhere = t.Partial(
   t.Recursive(
     (Self) =>
       t.Object(
@@ -49,32 +87,31 @@ export const UserWhere = t.Partial(
           AND: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
-          id: t.Integer(),
-          username: t.String(),
-          email: t.String(),
-          password: t.String(),
+          id: t.String(),
+          url: t.String(),
+          songId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
         { additionalProperties: false },
       ),
-    { $id: "User" },
+    { $id: "Audio" },
   ),
 );
 
-export const UserWhereUnique = t.Recursive(
+export const AudioWhereUnique = t.Recursive(
   (Self) =>
     t.Intersect(
       [
         t.Partial(
           t.Object(
-            { id: t.Integer(), username: t.String() },
+            { id: t.String(), songId: t.String() },
             { additionalProperties: false },
           ),
           { additionalProperties: false },
         ),
         t.Union(
-          [t.Object({ id: t.Integer() }), t.Object({ username: t.String() })],
+          [t.Object({ id: t.String() }), t.Object({ songId: t.String() })],
           { additionalProperties: false },
         ),
         t.Partial(
@@ -94,10 +131,9 @@ export const UserWhereUnique = t.Recursive(
         t.Partial(
           t.Object(
             {
-              id: t.Integer(),
-              username: t.String(),
-              email: t.String(),
-              password: t.String(),
+              id: t.String(),
+              url: t.String(),
+              songId: t.String(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
             },
@@ -107,16 +143,16 @@ export const UserWhereUnique = t.Recursive(
       ],
       { additionalProperties: false },
     ),
-  { $id: "User" },
+  { $id: "Audio" },
 );
 
-export const UserSelect = t.Partial(
+export const AudioSelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      username: t.Boolean(),
-      email: t.Boolean(),
-      password: t.Boolean(),
+      url: t.Boolean(),
+      songId: t.Boolean(),
+      song: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
       _count: t.Boolean(),
@@ -125,23 +161,23 @@ export const UserSelect = t.Partial(
   ),
 );
 
-export const UserInclude = t.Partial(
-  t.Object({ _count: t.Boolean() }, { additionalProperties: false }),
+export const AudioInclude = t.Partial(
+  t.Object(
+    { song: t.Boolean(), _count: t.Boolean() },
+    { additionalProperties: false },
+  ),
 );
 
-export const UserOrderBy = t.Partial(
+export const AudioOrderBy = t.Partial(
   t.Object(
     {
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      username: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      url: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      email: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      password: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      songId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
@@ -155,16 +191,16 @@ export const UserOrderBy = t.Partial(
   ),
 );
 
-export const User = t.Composite([UserPlain, UserRelations], {
+export const Audio = t.Composite([AudioPlain, AudioRelations], {
   additionalProperties: false,
 });
 
-export const UserInputCreate = t.Composite(
-  [UserPlainInputCreate, UserRelationsInputCreate],
+export const AudioInputCreate = t.Composite(
+  [AudioPlainInputCreate, AudioRelationsInputCreate],
   { additionalProperties: false },
 );
 
-export const UserInputUpdate = t.Composite(
-  [UserPlainInputUpdate, UserRelationsInputUpdate],
+export const AudioInputUpdate = t.Composite(
+  [AudioPlainInputUpdate, AudioRelationsInputUpdate],
   { additionalProperties: false },
 );

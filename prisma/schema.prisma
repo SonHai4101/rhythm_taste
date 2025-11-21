@@ -11,6 +11,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator prismabox {
@@ -22,10 +23,12 @@ generator prismabox {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  email    String
-  password String
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Song {
@@ -34,6 +37,16 @@ model Song {
   artist    String?
   album     String?
   duration  Int? // seconds
-  fileUrl   String // stored file path
+  audio     Audio?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Audio {
+  id        String   @id @default(cuid())
+  url       String
+  songId    String   @unique
+  song      Song     @relation(fields: [songId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
