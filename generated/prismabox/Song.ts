@@ -11,13 +11,29 @@ export const SongPlain = t.Object(
     artist: __nullable__(t.String()),
     album: __nullable__(t.String()),
     duration: __nullable__(t.Integer()),
-    fileUrl: t.String(),
     createdAt: t.Date(),
+    updatedAt: t.Date(),
   },
   { additionalProperties: false },
 );
 
-export const SongRelations = t.Object({}, { additionalProperties: false });
+export const SongRelations = t.Object(
+  {
+    audio: __nullable__(
+      t.Object(
+        {
+          id: t.String(),
+          url: t.String(),
+          songId: t.String(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+  },
+  { additionalProperties: false },
+);
 
 export const SongPlainInputCreate = t.Object(
   {
@@ -25,7 +41,6 @@ export const SongPlainInputCreate = t.Object(
     artist: t.Optional(__nullable__(t.String())),
     album: t.Optional(__nullable__(t.String())),
     duration: t.Optional(__nullable__(t.Integer())),
-    fileUrl: t.String(),
   },
   { additionalProperties: false },
 );
@@ -36,18 +51,49 @@ export const SongPlainInputUpdate = t.Object(
     artist: t.Optional(__nullable__(t.String())),
     album: t.Optional(__nullable__(t.String())),
     duration: t.Optional(__nullable__(t.Integer())),
-    fileUrl: t.Optional(t.String()),
   },
   { additionalProperties: false },
 );
 
 export const SongRelationsInputCreate = t.Object(
-  {},
+  {
+    audio: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.String({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+  },
   { additionalProperties: false },
 );
 
 export const SongRelationsInputUpdate = t.Partial(
-  t.Object({}, { additionalProperties: false }),
+  t.Object(
+    {
+      audio: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+    },
+    { additionalProperties: false },
+  ),
 );
 
 export const SongWhere = t.Partial(
@@ -63,8 +109,8 @@ export const SongWhere = t.Partial(
           artist: t.String(),
           album: t.String(),
           duration: t.Integer(),
-          fileUrl: t.String(),
           createdAt: t.Date(),
+          updatedAt: t.Date(),
         },
         { additionalProperties: false },
       ),
@@ -105,8 +151,8 @@ export const SongWhereUnique = t.Recursive(
               artist: t.String(),
               album: t.String(),
               duration: t.Integer(),
-              fileUrl: t.String(),
               createdAt: t.Date(),
+              updatedAt: t.Date(),
             },
             { additionalProperties: false },
           ),
@@ -125,8 +171,9 @@ export const SongSelect = t.Partial(
       artist: t.Boolean(),
       album: t.Boolean(),
       duration: t.Boolean(),
-      fileUrl: t.Boolean(),
+      audio: t.Boolean(),
       createdAt: t.Boolean(),
+      updatedAt: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -134,7 +181,10 @@ export const SongSelect = t.Partial(
 );
 
 export const SongInclude = t.Partial(
-  t.Object({ _count: t.Boolean() }, { additionalProperties: false }),
+  t.Object(
+    { audio: t.Boolean(), _count: t.Boolean() },
+    { additionalProperties: false },
+  ),
 );
 
 export const SongOrderBy = t.Partial(
@@ -155,10 +205,10 @@ export const SongOrderBy = t.Partial(
       duration: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      fileUrl: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      updatedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },
