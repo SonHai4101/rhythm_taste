@@ -1,10 +1,12 @@
 import { Elysia } from "elysia";
-
+import cors from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { authPlugin } from "./plugin/authPlugin";
 import { uploadAudioPlugin } from "./plugin/uploadAudioPlugin";
+import { betterUploadPlugin } from "./plugin/betterUploadPlugin";
 
 const app = new Elysia()
+  .use(cors())
   .use(
     swagger({
       provider: "swagger-ui",
@@ -28,7 +30,7 @@ const app = new Elysia()
             description: "Authentication endpoints",
           },
           {
-            name: "Audio",
+            name: "Better Upload",
             description: "Upload audio endpoints",
           },
         ],
@@ -55,7 +57,9 @@ const app = new Elysia()
   .get("/health", () => "OK, working gud!", {
     tags: ["Health"],
   })
-  .group("/api", (app) => app.use(authPlugin).use(uploadAudioPlugin))
+  .group("/api", (app) =>
+    app.use(authPlugin).use(uploadAudioPlugin).use(betterUploadPlugin)
+  )
   .listen(8080);
 
 console.log(

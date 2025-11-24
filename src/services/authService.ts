@@ -67,7 +67,7 @@ export const authService = new Elysia({ name: "Service.Auth" })
       });
       return {
         user: userWithoutPassword,
-        asscessToken: token,
+        accessToken: token,
       };
     };
 
