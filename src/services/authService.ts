@@ -35,7 +35,7 @@ export const authService = new Elysia({ name: "Service.Auth" })
           password: hashedPassword,
         },
       });
-    };
+    }; 
 
     const login = async (
       body: Pick<Prisma.UserCreateInput, "username" | "password">
