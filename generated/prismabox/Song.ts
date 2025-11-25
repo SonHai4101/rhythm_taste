@@ -24,6 +24,7 @@ export const SongRelations = t.Object(
         {
           id: t.String(),
           url: t.String(),
+          key: t.String(),
           songId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),

@@ -1,50 +1,228 @@
-// import prisma from "../db";
-// import fs from "fs/promises";
-// import path from "path";
+import Elysia from "elysia";
+import { Prisma } from "../generated/prisma/client";
+import db from "../db";
 
-// const UPLOAD_DIR = path.resolve(process.cwd(), "uploads");
+export const songService = new Elysia().derive(
+  { as: "scoped" },
+  ({ status }) => {
+    // Create a new song
+    const createSong = async (
+      data: Omit<Prisma.SongCreateInput, "audio"> & {
+        audioUrl?: string;
+        audioKey?: string;
+      }
+    ) => {
+      try {
+        const song = await db.song.create({
+          data: {
+            title: data.title,
+            artist: data.artist,
+            album: data.album,
+            duration: data.duration,
+            ...(data.audioUrl &&
+              data.audioKey && {
+                audio: {
+                  create: {
+                    url: data.audioUrl,
+                    key: data.audioKey,
+                  },
+                },
+              }),
+          },
+          include: {
+            audio: true,
+          },
+        });
+        return song;
+      } catch (error: any) {
+        throw status(400, {
+          success: false,
+          message: `Failed to create song: ${error.message}`,
+        });
+      }
+    };
 
-// async function ensureUploadDir() {
-//   try {
-//     await fs.mkdir(UPLOAD_DIR, { recursive: true });
-//   } catch (e) {
-//     // ignore
-//   }
-// }
+    // Get all songs
+    const getAllSongs = async () => {
+      try {
+        const songs = await db.song.findMany({
+          include: {
+            audio: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        return songs;
+      } catch (error: any) {
+        throw status(400, {
+          success: false,
+          message: `Failed to fetch songs: ${error.message}`,
+        });
+      }
+    };
 
-// type UploadInput = {
-//   filename: string;
-//   fileBase64: string;
-//   title: string;
-//   artist?: string | null;
-//   album?: string | null;
-//   duration?: number | null;
-// };
+    // Get song by ID
+    const getSongById = async (id: string) => {
+      try {
+        const song = await db.song.findUnique({
+          where: { id },
+          include: {
+            audio: true,
+          },
+        });
+        if (!song) {
+          throw status(404, {
+            success: false,
+            message: "Song not found",
+          });
+        }
+        return song;
+      } catch (error: any) {
+        if (error.status === 404) throw error;
+        throw status(400, {
+          success: false,
+          message: `Failed to fetch song: ${error.message}`,
+        });
+      }
+    };
 
-// export async function uploadSong(input: UploadInput) {
-//   const { filename, fileBase64, title, artist, album, duration } = input;
+    // Update song
+    const updateSong = async (
+      id: string,
+      data: Partial<Omit<Prisma.SongUpdateInput, "audio">> & {
+        audioUrl?: string;
+        audioKey?: string;
+      }
+    ) => {
+      try {
+        const existingSong = await db.song.findUnique({
+          where: { id },
+          include: { audio: true },
+        });
 
-//   await ensureUploadDir();
+        if (!existingSong) {
+          throw status(404, {
+            success: false,
+            message: "Song not found",
+          });
+        }
 
-//   const buffer = Buffer.from(fileBase64, "base64");
+        const updateData: any = {
+          ...(data.title && { title: data.title }),
+          ...(data.artist !== undefined && { artist: data.artist }),
+          ...(data.album !== undefined && { album: data.album }),
+          ...(data.duration !== undefined && { duration: data.duration }),
+        };
 
-//   const safe = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-//   const name = `${Date.now()}-${safe}`;
-//   const filePath = path.join(UPLOAD_DIR, name);
+        // Handle audio update
+        if (data.audioUrl && data.audioKey) {
+          if (existingSong.audio) {
+            // Update existing audio
+            updateData.audio = {
+              update: {
+                url: data.audioUrl,
+                key: data.audioKey,
+              },
+            };
+          } else {
+            // Create new audio
+            updateData.audio = {
+              create: {
+                url: data.audioUrl,
+                key: data.audioKey,
+              },
+            };
+          }
+        }
 
-//   await fs.writeFile(filePath, buffer);
+        const updatedSong = await db.song.update({
+          where: { id },
+          data: updateData,
+          include: {
+            audio: true,
+          },
+        });
 
-//   const fileUrl = `/uploads/${name}`;
+        return updatedSong;
+      } catch (error: any) {
+        if (error.status === 404) throw error;
+        throw status(400, {
+          success: false,
+          message: `Failed to update song: ${error.message}`,
+        });
+      }
+    };
 
-//   const song = await prisma.song.create({
-//     data: {
-//       title,
-//       artist: artist ?? null,
-//       album: album ?? null,
-//       duration: duration ?? null,
-//       fileUrl,
-//     },
-//   });
+    // Delete song
+    const deleteSong = async (id: string) => {
+      try {
+        const song = await db.song.findUnique({
+          where: { id },
+          include: { audio: true },
+        });
 
-//   return song;
-// }
+        if (!song) {
+          throw status(404, {
+            success: false,
+            message: "Song not found",
+          });
+        }
+
+        // Delete the song (audio will be deleted automatically due to cascade)
+        await db.song.delete({
+          where: { id },
+        });
+
+        return {
+          success: true,
+          message: "Song deleted successfully",
+          audioId: song.audio?.id, // Return audio ID so caller can delete from storage
+          audioKey: song.audio?.key, // Return R2 key for storage deletion
+        };
+      } catch (error: any) {
+        if (error.status === 404) throw error;
+        throw status(400, {
+          success: false,
+          message: `Failed to delete song: ${error.message}`,
+        });
+      }
+    };
+
+    // Search songs by title or artist
+    const searchSongs = async (query: string) => {
+      try {
+        const songs = await db.song.findMany({
+          where: {
+            OR: [
+              { title: { contains: query, mode: "insensitive" } },
+              { artist: { contains: query, mode: "insensitive" } },
+              { album: { contains: query, mode: "insensitive" } },
+            ],
+          },
+          include: {
+            audio: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        return songs;
+      } catch (error: any) {
+        throw status(400, {
+          success: false,
+          message: `Failed to search songs: ${error.message}`,
+        });
+      }
+    };
+
+    return {
+      createSong,
+      getAllSongs,
+      getSongById,
+      updateSong,
+      deleteSong,
+      searchSongs,
+    };
+  }
+);

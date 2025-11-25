@@ -4,6 +4,7 @@ import { swagger } from "@elysiajs/swagger";
 import { authPlugin } from "./plugin/authPlugin";
 import { uploadAudioPlugin } from "./plugin/uploadAudioPlugin";
 import { betterUploadPlugin } from "./plugin/betterUploadPlugin";
+import { songPlugin } from "./plugin/songPlugin";
 
 const app = new Elysia()
   .use(cors())
@@ -33,6 +34,10 @@ const app = new Elysia()
             name: "Better Upload",
             description: "Upload audio endpoints",
           },
+          {
+            name: "Song",
+            description: "Song endpoints",
+          },
         ],
         components: {
           securitySchemes: {
@@ -58,7 +63,11 @@ const app = new Elysia()
     tags: ["Health"],
   })
   .group("/api", (app) =>
-    app.use(authPlugin).use(uploadAudioPlugin).use(betterUploadPlugin)
+    app
+      .use(authPlugin)
+      .use(uploadAudioPlugin)
+      .use(betterUploadPlugin)
+      .use(songPlugin)
   )
   .listen(8080);
 

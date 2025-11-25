@@ -44,6 +44,7 @@ model Song {
 model Audio {
   id        String   @id @default(cuid())
   url       String
+  key       String // R2 object key for file management
   songId    String   @unique
   song      Song     @relation(fields: [songId], references: [id])
   createdAt DateTime @default(now())

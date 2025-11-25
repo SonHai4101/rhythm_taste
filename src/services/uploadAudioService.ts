@@ -34,7 +34,8 @@ export const uploadAudioService = new Elysia().derive(
       } catch (error: any) {
         throw status(400, `Failed to upload audio: ${error.message}`);
       }
-      return url;
+
+      return { url, key: objectKey };
     };
 
     const deleteAudio = async (audioId: string) => {
@@ -43,14 +44,12 @@ export const uploadAudioService = new Elysia().derive(
       });
       if (!audio) throw status(404, "Audio file Not Found");
 
-      const urlPart = audio.url.split("/");
-      const objectKey = urlPart.slice(4).join("/");
-
       try {
+        // Use the stored key instead of parsing from URL
         await r2.send(
           new DeleteObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME!,
-            Key: objectKey,
+            Key: audio.key,
           })
         );
         await prisma.audio.delete({

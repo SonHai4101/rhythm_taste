@@ -8,6 +8,7 @@ export const AudioPlain = t.Object(
   {
     id: t.String(),
     url: t.String(),
+    key: t.String(),
     songId: t.String(),
     createdAt: t.Date(),
     updatedAt: t.Date(),
@@ -34,12 +35,12 @@ export const AudioRelations = t.Object(
 );
 
 export const AudioPlainInputCreate = t.Object(
-  { url: t.String() },
+  { url: t.String(), key: t.String() },
   { additionalProperties: false },
 );
 
 export const AudioPlainInputUpdate = t.Object(
-  { url: t.Optional(t.String()) },
+  { url: t.Optional(t.String()), key: t.Optional(t.String()) },
   { additionalProperties: false },
 );
 
@@ -89,6 +90,7 @@ export const AudioWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.String(),
           url: t.String(),
+          key: t.String(),
           songId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
@@ -133,6 +135,7 @@ export const AudioWhereUnique = t.Recursive(
             {
               id: t.String(),
               url: t.String(),
+              key: t.String(),
               songId: t.String(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
@@ -151,6 +154,7 @@ export const AudioSelect = t.Partial(
     {
       id: t.Boolean(),
       url: t.Boolean(),
+      key: t.Boolean(),
       songId: t.Boolean(),
       song: t.Boolean(),
       createdAt: t.Boolean(),
@@ -175,6 +179,9 @@ export const AudioOrderBy = t.Partial(
         additionalProperties: false,
       }),
       url: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      key: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       songId: t.Union([t.Literal("asc"), t.Literal("desc")], {
