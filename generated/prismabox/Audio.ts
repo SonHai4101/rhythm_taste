@@ -18,17 +18,19 @@ export const AudioPlain = t.Object(
 
 export const AudioRelations = t.Object(
   {
-    song: t.Object(
-      {
-        id: t.String(),
-        title: t.String(),
-        artist: __nullable__(t.String()),
-        album: __nullable__(t.String()),
-        duration: __nullable__(t.Integer()),
-        createdAt: t.Date(),
-        updatedAt: t.Date(),
-      },
-      { additionalProperties: false },
+    song: __nullable__(
+      t.Object(
+        {
+          id: t.String(),
+          title: t.String(),
+          artist: __nullable__(t.String()),
+          album: __nullable__(t.String()),
+          duration: __nullable__(t.Integer()),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
     ),
   },
   { additionalProperties: false },
@@ -46,25 +48,8 @@ export const AudioPlainInputUpdate = t.Object(
 
 export const AudioRelationsInputCreate = t.Object(
   {
-    song: t.Object(
-      {
-        connect: t.Object(
-          {
-            id: t.String({ additionalProperties: false }),
-          },
-          { additionalProperties: false },
-        ),
-      },
-      { additionalProperties: false },
-    ),
-  },
-  { additionalProperties: false },
-);
-
-export const AudioRelationsInputUpdate = t.Partial(
-  t.Object(
-    {
-      song: t.Object(
+    song: t.Optional(
+      t.Object(
         {
           connect: t.Object(
             {
@@ -74,6 +59,28 @@ export const AudioRelationsInputUpdate = t.Partial(
           ),
         },
         { additionalProperties: false },
+      ),
+    ),
+  },
+  { additionalProperties: false },
+);
+
+export const AudioRelationsInputUpdate = t.Partial(
+  t.Object(
+    {
+      song: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
       ),
     },
     { additionalProperties: false },

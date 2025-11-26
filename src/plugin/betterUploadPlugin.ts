@@ -2,6 +2,8 @@ import Elysia from "elysia";
 import { handleRequest, route, type Router } from "@better-upload/server";
 import { cloudflare } from "@better-upload/server/clients";
 import { authService } from "../services/authService";
+import prisma from "../db";
+import * as mm from "music-metadata";
 
 const s3 = cloudflare({
   accountId: process.env.R2_ACCOUNT_ID!,
@@ -16,6 +18,25 @@ const router: Router = {
     audio: route({
       fileTypes: ["audio/*"],
       maxFileSize: 100 * 1024 * 1024,
+      onAfterSignedUrl: async ({ file }) => {
+        const key = file.objectInfo.key;
+        const originalName = file.name;
+        const publicUrl = `${process.env.AUDIO_R2_PUBLIC_URL}/${key}`;
+
+        const title = originalName.replace(/\.[^/.]+$/, "");
+        const song = await prisma.song.create({
+          data: {
+            title,
+          },
+        });
+        await prisma.audio.create({
+          data: {
+            key: key,
+            url: publicUrl,
+            songId: song.id,
+          },
+        });
+      },
     }),
   },
 };
