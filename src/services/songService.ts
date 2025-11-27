@@ -79,71 +79,71 @@ export const songService = new Elysia().derive(
     };
 
     // Update song
-    const updateSong = async (
-      id: string,
-      data: Partial<Omit<Prisma.SongUpdateInput, "audio">> & {
-        audioUrl?: string;
-        audioKey?: string;
-      }
-    ) => {
-      try {
-        const existingSong = await db.song.findUnique({
-          where: { id },
-          include: { audio: true },
-        });
+    // const updateSong = async (
+    //   id: string,
+    //   data: Partial<Omit<Prisma.SongUpdateInput, "audio">> & {
+    //     audioUrl?: string;
+    //     audioKey?: string;
+    //   }
+    // ) => {
+    //   try {
+    //     const existingSong = await db.song.findUnique({
+    //       where: { id },
+    //       include: { audio: true },
+    //     });
 
-        if (!existingSong) {
-          throw status(404, {
-            success: false,
-            message: "Song not found",
-          });
-        }
+    //     if (!existingSong) {
+    //       throw status(404, {
+    //         success: false,
+    //         message: "Song not found",
+    //       });
+    //     }
 
-        const updateData: any = {
-          ...(data.title && { title: data.title }),
-          ...(data.artist !== undefined && { artist: data.artist }),
-          ...(data.album !== undefined && { album: data.album }),
-          ...(data.duration !== undefined && { duration: data.duration }),
-        };
+    //     const updateData: any = {
+    //       ...(data.title && { title: data.title }),
+    //       ...(data.artist !== undefined && { artist: data.artist }),
+    //       ...(data.album !== undefined && { album: data.album }),
+    //       ...(data.duration !== undefined && { duration: data.duration }),
+    //     };
 
-        // Handle audio update
-        if (data.audioUrl && data.audioKey) {
-          if (existingSong.audio) {
-            // Update existing audio
-            updateData.audio = {
-              update: {
-                url: data.audioUrl,
-                key: data.audioKey,
-              },
-            };
-          } else {
-            // Create new audio
-            updateData.audio = {
-              create: {
-                url: data.audioUrl,
-                key: data.audioKey,
-              },
-            };
-          }
-        }
+    //     // Handle audio update
+    //     if (data.audioUrl && data.audioKey) {
+    //       if (existingSong.audio) {
+    //         // Update existing audio
+    //         updateData.audio = {
+    //           update: {
+    //             url: data.audioUrl,
+    //             key: data.audioKey,
+    //           },
+    //         };
+    //       } else {
+    //         // Create new audio
+    //         updateData.audio = {
+    //           create: {
+    //             url: data.audioUrl,
+    //             key: data.audioKey,
+    //           },
+    //         };
+    //       }
+    //     }
 
-        const updatedSong = await db.song.update({
-          where: { id },
-          data: updateData,
-          include: {
-            audio: true,
-          },
-        });
+    //     const updatedSong = await db.song.update({
+    //       where: { id },
+    //       data: updateData,
+    //       include: {
+    //         audio: true,
+    //       },
+    //     });
 
-        return updatedSong;
-      } catch (error: any) {
-        if (error.status === 404) throw error;
-        throw status(400, {
-          success: false,
-          message: `Failed to update song: ${error.message}`,
-        });
-      }
-    };
+    //     return updatedSong;
+    //   } catch (error: any) {
+    //     if (error.status === 404) throw error;
+    //     throw status(400, {
+    //       success: false,
+    //       message: `Failed to update song: ${error.message}`,
+    //     });
+    //   }
+    // };
 
     // Delete song
     const deleteSong = async (id: string) => {
