@@ -58,24 +58,24 @@ export const songPlugin = new Elysia({
     }
   )
   // Update song
-  .put(
-    "/:id",
-    async ({ params, body, updateSong }) => {
-      return updateSong(params.id, body);
-    },
-    {
-      params: t.Object({
-        id: t.String(),
-      }),
-      body: t.Intersect([
-        SongPlainInputUpdate,
-        t.Object({
-          audioUrl: t.Optional(t.String()),
-          audioKey: t.Optional(t.String()),
-        }),
-      ]),
-    }
-  )
+  // .put(
+  //   "/:id",
+  //   async ({ params, body, updateSong }) => {
+  //     return updateSong(params.id, body);
+  //   },
+  //   {
+  //     params: t.Object({
+  //       id: t.String(),
+  //     }),
+  //     body: t.Intersect([
+  //       SongPlainInputUpdate,
+  //       t.Object({
+  //         audioUrl: t.Optional(t.String()),
+  //         audioKey: t.Optional(t.String()),
+  //       }),
+  //     ]),
+  //   }
+  // )
   // Delete song
   .delete(
     "/:id",

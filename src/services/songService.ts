@@ -211,7 +211,7 @@ export const songService = new Elysia().derive(
       createSong,
       getAllSongs,
       getSongById,
-      updateSong,
+    //   updateSong,
       deleteSong,
       searchSongs,
     };

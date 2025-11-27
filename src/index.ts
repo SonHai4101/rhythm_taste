@@ -67,7 +67,7 @@ const app = new Elysia()
       .use(authPlugin)
       .use(uploadAudioPlugin)
       .use(betterUploadPlugin)
-      // .use(songPlugin)
+      .use(songPlugin)
   )
   .listen(8080);
 
