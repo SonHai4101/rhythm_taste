@@ -20,20 +20,12 @@ const router: Router = {
       maxFileSize: 100 * 1024 * 1024,
       onAfterSignedUrl: async ({ file }) => {
         const key = file.objectInfo.key;
-        const originalName = file.name;
         const publicUrl = `${process.env.AUDIO_R2_PUBLIC_URL}/${key}`;
 
-        const title = originalName.replace(/\.[^/.]+$/, "");
-        const song = await prisma.song.create({
-          data: {
-            title,
-          },
-        });
         await prisma.audio.create({
           data: {
             key: key,
             url: publicUrl,
-            songId: song.id,
           },
         });
       },

@@ -9,7 +9,6 @@ export const AudioPlain = t.Object(
     id: t.String(),
     url: t.String(),
     key: t.String(),
-    songId: t.String(),
     createdAt: t.Date(),
     updatedAt: t.Date(),
   },
@@ -26,6 +25,7 @@ export const AudioRelations = t.Object(
           artist: __nullable__(t.String()),
           album: __nullable__(t.String()),
           duration: __nullable__(t.Integer()),
+          audioId: __nullable__(t.String()),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
@@ -98,7 +98,6 @@ export const AudioWhere = t.Partial(
           id: t.String(),
           url: t.String(),
           key: t.String(),
-          songId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
@@ -113,16 +112,12 @@ export const AudioWhereUnique = t.Recursive(
     t.Intersect(
       [
         t.Partial(
-          t.Object(
-            { id: t.String(), songId: t.String() },
-            { additionalProperties: false },
-          ),
+          t.Object({ id: t.String() }, { additionalProperties: false }),
           { additionalProperties: false },
         ),
-        t.Union(
-          [t.Object({ id: t.String() }), t.Object({ songId: t.String() })],
-          { additionalProperties: false },
-        ),
+        t.Union([t.Object({ id: t.String() })], {
+          additionalProperties: false,
+        }),
         t.Partial(
           t.Object({
             AND: t.Union([
@@ -143,7 +138,6 @@ export const AudioWhereUnique = t.Recursive(
               id: t.String(),
               url: t.String(),
               key: t.String(),
-              songId: t.String(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
             },
@@ -162,7 +156,6 @@ export const AudioSelect = t.Partial(
       id: t.Boolean(),
       url: t.Boolean(),
       key: t.Boolean(),
-      songId: t.Boolean(),
       song: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
@@ -189,9 +182,6 @@ export const AudioOrderBy = t.Partial(
         additionalProperties: false,
       }),
       key: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      songId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {

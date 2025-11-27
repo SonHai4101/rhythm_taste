@@ -11,6 +11,7 @@ export const SongPlain = t.Object(
     artist: __nullable__(t.String()),
     album: __nullable__(t.String()),
     duration: __nullable__(t.Integer()),
+    audioId: __nullable__(t.String()),
     createdAt: t.Date(),
     updatedAt: t.Date(),
   },
@@ -25,7 +26,6 @@ export const SongRelations = t.Object(
           id: t.String(),
           url: t.String(),
           key: t.String(),
-          songId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
@@ -110,6 +110,7 @@ export const SongWhere = t.Partial(
           artist: t.String(),
           album: t.String(),
           duration: t.Integer(),
+          audioId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
@@ -124,12 +125,16 @@ export const SongWhereUnique = t.Recursive(
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.String() }, { additionalProperties: false }),
+          t.Object(
+            { id: t.String(), audioId: t.String() },
+            { additionalProperties: false },
+          ),
           { additionalProperties: false },
         ),
-        t.Union([t.Object({ id: t.String() })], {
-          additionalProperties: false,
-        }),
+        t.Union(
+          [t.Object({ id: t.String() }), t.Object({ audioId: t.String() })],
+          { additionalProperties: false },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([
@@ -152,6 +157,7 @@ export const SongWhereUnique = t.Recursive(
               artist: t.String(),
               album: t.String(),
               duration: t.Integer(),
+              audioId: t.String(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
             },
@@ -172,6 +178,7 @@ export const SongSelect = t.Partial(
       artist: t.Boolean(),
       album: t.Boolean(),
       duration: t.Boolean(),
+      audioId: t.Boolean(),
       audio: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
@@ -204,6 +211,9 @@ export const SongOrderBy = t.Partial(
         additionalProperties: false,
       }),
       duration: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      audioId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {

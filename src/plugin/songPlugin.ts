@@ -28,8 +28,7 @@ export const songPlugin = new Elysia({
       body: t.Intersect([
         SongPlainInputCreate,
         t.Object({
-          audioUrl: t.Optional(t.String()),
-          audioKey: t.Optional(t.String()),
+          audioId: t.String(),
         }),
       ]),
     }
