@@ -18,7 +18,7 @@ export const songService = new Elysia().derive(
             artist: data.artist,
             album: data.album,
             duration: data.duration,
-            audioId: data.audioId
+            audioId: data.audioId,
           },
           include: {
             audio: true,
@@ -34,17 +34,48 @@ export const songService = new Elysia().derive(
     };
 
     // Get all songs
-    const getAllSongs = async () => {
+    const getAllSongs = async (params: {
+      page: number;
+      limit: number;
+      artist?: string;
+      album?: string;
+    }) => {
       try {
+        const { page = 1, limit = 20, artist, album } = params;
+        const skip = (page - 1) * limit;
+
+        const whereConditions: any[] = [];
+        if (artist)
+          whereConditions.push({
+            artist: { contains: artist, mode: "insensitive" },
+          });
+        if (album)
+          whereConditions.push({
+            album: { contains: album, mode: "insensitive" },
+          });
+        const where =
+          whereConditions.length > 0 ? { AND: whereConditions } : {};
+
+        // Get total count for pagination
+        const total = await db.song.count({ where });
+
         const songs = await db.song.findMany({
+          where,
           include: {
             audio: true,
           },
           orderBy: {
             createdAt: "desc",
           },
+          skip,
+          take: limit,
         });
-        return songs;
+        return {songs, pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+          },};
       } catch (error: any) {
         throw status(400, {
           success: false,
@@ -211,7 +242,7 @@ export const songService = new Elysia().derive(
       createSong,
       getAllSongs,
       getSongById,
-    //   updateSong,
+      //   updateSong,
       deleteSong,
       searchSongs,
     };

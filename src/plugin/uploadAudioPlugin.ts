@@ -31,4 +31,15 @@ export const uploadAudioPlugin = new Elysia({
         id: t.String(),
       }),
     }
+  )
+  .get(
+    "/key/:key",
+    ({ params: { key }, getAudioByKey }) => {
+      return getAudioByKey(key);
+    },
+    {
+      params: t.Object({
+        key: t.String(),
+      }),
+    }
   );

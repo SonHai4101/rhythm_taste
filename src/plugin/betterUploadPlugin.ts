@@ -3,7 +3,6 @@ import { handleRequest, route, type Router } from "@better-upload/server";
 import { cloudflare } from "@better-upload/server/clients";
 import { authService } from "../services/authService";
 import prisma from "../db";
-import * as mm from "music-metadata";
 
 const s3 = cloudflare({
   accountId: process.env.R2_ACCOUNT_ID!,

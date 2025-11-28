@@ -60,6 +60,14 @@ export const uploadAudioService = new Elysia().derive(
       }
     };
 
+    const getAudioByKey = async (key: string) => {
+      const audio = await prisma.audio.findFirst({
+        where: { key },
+      });
+      if (!audio) throw status(404, "Audio file not found");
+      return audio;
+    };
+
     // const updateAudioMeta = async (audioId: string) => {
     //      const audio = await prisma.audio.findUnique({
     //         where: { id: audioId }
@@ -73,6 +81,7 @@ export const uploadAudioService = new Elysia().derive(
     return {
       uploadAudio,
       deleteAudio,
+      getAudioByKey,
     };
   }
 );

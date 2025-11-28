@@ -15,9 +15,25 @@ export const songPlugin = new Elysia({
   .use(songService)
   .guard({ isSignIn: true })
   // Get all songs
-  .get("/", async ({ getAllSongs }) => {
-    return getAllSongs();
-  })
+  .get(
+    "/",
+    async ({ query, getAllSongs }) => {
+      return getAllSongs({
+        page: query.page || 1,
+        limit: query.limit || 20,
+        artist: query.artist,
+        album: query.album,
+      });
+    },
+    {
+      query: t.Object({
+        page: t.Optional(t.Numeric()),
+        limit: t.Optional(t.Numeric()),
+        artist: t.Optional(t.String()),
+        album: t.Optional(t.String()),
+      }),
+    }
+  )
   // Create a new song
   .post(
     "/",
@@ -25,12 +41,13 @@ export const songPlugin = new Elysia({
       return createSong(body);
     },
     {
-      body: t.Intersect([
-        SongPlainInputCreate,
-        t.Object({
-          audioId: t.String(),
-        }),
-      ]),
+      body: t.Object({
+        title: t.String(),
+        artist: t.Optional(t.Union([t.String(), t.Null()])),
+        album: t.Optional(t.Union([t.String(), t.Null()])),
+        duration: t.Optional(t.Union([t.Number(), t.Null()])),
+        audioId: t.String(),
+      }),
     }
   )
   // Search songs by query
