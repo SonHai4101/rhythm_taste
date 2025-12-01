@@ -17,6 +17,7 @@ export const songService = new Elysia().derive(
             title: data.title,
             artist: data.artist,
             album: data.album,
+            albumCover: data.albumCover,
             duration: data.duration,
             audioId: data.audioId,
           },
@@ -59,7 +60,7 @@ export const songService = new Elysia().derive(
         // Get total count for pagination
         const total = await db.song.count({ where });
 
-        const songs = await db.song.findMany({
+        const data = await db.song.findMany({
           where,
           include: {
             audio: true,
@@ -70,7 +71,7 @@ export const songService = new Elysia().derive(
           skip,
           take: limit,
         });
-        return {songs, pagination: {
+        return {data, pagination: {
             total,
             page,
             limit,

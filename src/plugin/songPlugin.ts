@@ -45,6 +45,7 @@ export const songPlugin = new Elysia({
         title: t.String(),
         artist: t.Optional(t.Union([t.String(), t.Null()])),
         album: t.Optional(t.Union([t.String(), t.Null()])),
+        albumCover: t.Optional(t.Union([t.String(), t.Null()])),
         duration: t.Optional(t.Union([t.Number(), t.Null()])),
         audioId: t.String(),
       }),
