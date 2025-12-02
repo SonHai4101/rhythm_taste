@@ -55,6 +55,12 @@ export const uploadAudioService = new Elysia().derive(
         await prisma.audio.delete({
           where: { id: audioId },
         });
+        return {
+          success: true,
+          message: "Audio delete successfully",
+          audioId: audio.id,
+          audioKey: audio.key,
+        };
       } catch (error: any) {
         throw status(400, `Error deleting audio: ${error.message}`);
       }
