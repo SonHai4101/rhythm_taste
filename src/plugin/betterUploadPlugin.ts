@@ -15,7 +15,7 @@ const router: Router = {
   bucketName: process.env.R2_BUCKET_NAME!,
   routes: {
     audio: route({
-      fileTypes: ["audio/*"],
+      fileTypes: ["audio/mp3"],
       maxFileSize: 100 * 1024 * 1024,
       onAfterSignedUrl: async ({ file }) => {
         const key = file.objectInfo.key;
