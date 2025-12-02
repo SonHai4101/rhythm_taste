@@ -38,7 +38,7 @@ model Song {
   albumCover String?
   duration   Int? // seconds
   audioId    String?  @unique
-  audio      Audio?   @relation(fields: [audioId], references: [id])
+  audio      Audio?   @relation(fields: [audioId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
