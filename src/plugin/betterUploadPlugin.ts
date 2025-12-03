@@ -38,7 +38,7 @@ const router: Router = {
     }),
   },
 };
-
+ 
 export const betterUploadPlugin = new Elysia({
   name: "Plugin.BetterUpload",
   prefix: "/upload",
