@@ -15,18 +15,25 @@ const router: Router = {
   bucketName: process.env.R2_BUCKET_NAME!,
   routes: {
     audio: route({
-      fileTypes: ["audio/mp3"],
+      multipleFiles: true, // Enable multiple file uploads
+      maxFiles: 10, // Maximum 10 files at once (default is 3)
+      fileTypes: ["audio/mpeg"],
       maxFileSize: 100 * 1024 * 1024,
-      onAfterSignedUrl: async ({ file }) => {
-        const key = file.objectInfo.key;
-        const publicUrl = `${process.env.AUDIO_R2_PUBLIC_URL}/${key}`;
+      onAfterSignedUrl: async ({ files }) => {
+        // Create Audio records for all uploaded files
+        await Promise.all(
+          files.map(async (file) => {
+            const key = file.objectInfo.key;
+            const publicUrl = `${process.env.AUDIO_R2_PUBLIC_URL}/${key}`;
 
-        await prisma.audio.create({
-          data: {
-            key: key,
-            url: publicUrl,
-          },
-        });
+            await prisma.audio.create({
+              data: {
+                key: key,
+                url: publicUrl,
+              },
+            });
+          })
+        );
       },
     }),
   },
