@@ -1,3 +1,4 @@
+export * from "./ROLE";
 export * from "./User";
 export * from "./Song";
 export * from "./Audio";

@@ -21,11 +21,17 @@ generator prismabox {
   output                      = "../generated/prismabox"
 }
 
+enum ROLE {
+  ADMIN
+  USER
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
   email     String
   password  String
+  role      ROLE     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

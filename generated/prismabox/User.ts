@@ -10,6 +10,9 @@ export const UserPlain = t.Object(
     username: t.String(),
     email: t.String(),
     password: t.String(),
+    role: t.Union([t.Literal("ADMIN"), t.Literal("USER")], {
+      additionalProperties: false,
+    }),
     createdAt: t.Date(),
     updatedAt: t.Date(),
   },
@@ -19,7 +22,16 @@ export const UserPlain = t.Object(
 export const UserRelations = t.Object({}, { additionalProperties: false });
 
 export const UserPlainInputCreate = t.Object(
-  { username: t.String(), email: t.String(), password: t.String() },
+  {
+    username: t.String(),
+    email: t.String(),
+    password: t.String(),
+    role: t.Optional(
+      t.Union([t.Literal("ADMIN"), t.Literal("USER")], {
+        additionalProperties: false,
+      }),
+    ),
+  },
   { additionalProperties: false },
 );
 
@@ -28,6 +40,11 @@ export const UserPlainInputUpdate = t.Object(
     username: t.Optional(t.String()),
     email: t.Optional(t.String()),
     password: t.Optional(t.String()),
+    role: t.Optional(
+      t.Union([t.Literal("ADMIN"), t.Literal("USER")], {
+        additionalProperties: false,
+      }),
+    ),
   },
   { additionalProperties: false },
 );
@@ -53,6 +70,9 @@ export const UserWhere = t.Partial(
           username: t.String(),
           email: t.String(),
           password: t.String(),
+          role: t.Union([t.Literal("ADMIN"), t.Literal("USER")], {
+            additionalProperties: false,
+          }),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
@@ -98,6 +118,9 @@ export const UserWhereUnique = t.Recursive(
               username: t.String(),
               email: t.String(),
               password: t.String(),
+              role: t.Union([t.Literal("ADMIN"), t.Literal("USER")], {
+                additionalProperties: false,
+              }),
               createdAt: t.Date(),
               updatedAt: t.Date(),
             },
@@ -117,6 +140,7 @@ export const UserSelect = t.Partial(
       username: t.Boolean(),
       email: t.Boolean(),
       password: t.Boolean(),
+      role: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
       _count: t.Boolean(),
@@ -126,7 +150,10 @@ export const UserSelect = t.Partial(
 );
 
 export const UserInclude = t.Partial(
-  t.Object({ _count: t.Boolean() }, { additionalProperties: false }),
+  t.Object(
+    { role: t.Boolean(), _count: t.Boolean() },
+    { additionalProperties: false },
+  ),
 );
 
 export const UserOrderBy = t.Partial(
