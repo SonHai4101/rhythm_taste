@@ -32,7 +32,7 @@ export const songPlugin = new Elysia({
         artist: t.Optional(t.String()),
         album: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // Create a new song
   .post(
@@ -49,7 +49,7 @@ export const songPlugin = new Elysia({
         duration: t.Optional(t.Union([t.Number(), t.Null()])),
         audioId: t.String(),
       }),
-    }
+    },
   )
   // Search songs by query
   .get(
@@ -61,7 +61,7 @@ export const songPlugin = new Elysia({
       query: t.Object({
         q: t.String({ minLength: 1 }),
       }),
-    }
+    },
   )
   // Get song by ID
   .get(
@@ -73,7 +73,7 @@ export const songPlugin = new Elysia({
       params: t.Object({
         id: t.String(),
       }),
-    }
+    },
   )
   // Update song
   // .put(
@@ -104,5 +104,5 @@ export const songPlugin = new Elysia({
       params: t.Object({
         id: t.String(),
       }),
-    }
+    },
   );

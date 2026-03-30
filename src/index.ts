@@ -5,6 +5,7 @@ import { authPlugin } from "./plugin/authPlugin";
 import { uploadAudioPlugin } from "./plugin/uploadAudioPlugin";
 import { betterUploadPlugin } from "./plugin/betterUploadPlugin";
 import { songPlugin } from "./plugin/songPlugin";
+import { categoryPlugin } from "./plugin/categoryPlugin";
 
 const app = new Elysia()
   .use(cors())
@@ -57,7 +58,7 @@ const app = new Elysia()
       swaggerOptions: {
         persistAuthorization: true,
       },
-    })
+    }),
   )
   .get("/health", () => "OK, working gud!", {
     tags: ["Health"],
@@ -65,12 +66,13 @@ const app = new Elysia()
   .group("/api", (app) =>
     app
       .use(authPlugin)
+      .use(categoryPlugin)
       .use(uploadAudioPlugin)
       .use(betterUploadPlugin)
-      .use(songPlugin)
+      .use(songPlugin),
   )
   .listen(8080);
 
 console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
