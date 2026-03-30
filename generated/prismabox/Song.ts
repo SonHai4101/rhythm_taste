@@ -13,6 +13,7 @@ export const SongPlain = t.Object(
     albumCover: __nullable__(t.String()),
     duration: __nullable__(t.Integer()),
     audioId: __nullable__(t.String()),
+    categoryId: __nullable__(t.String()),
     createdAt: t.Date(),
     updatedAt: t.Date(),
   },
@@ -30,6 +31,12 @@ export const SongRelations = t.Object(
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
+        { additionalProperties: false },
+      ),
+    ),
+    category: __nullable__(
+      t.Object(
+        { id: t.String(), name: t.String() },
         { additionalProperties: false },
       ),
     ),
@@ -74,6 +81,19 @@ export const SongRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
+    category: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.String({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
@@ -82,6 +102,20 @@ export const SongRelationsInputUpdate = t.Partial(
   t.Object(
     {
       audio: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      category: t.Partial(
         t.Object(
           {
             connect: t.Object(
@@ -115,6 +149,7 @@ export const SongWhere = t.Partial(
           albumCover: t.String(),
           duration: t.Integer(),
           audioId: t.String(),
+          categoryId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
@@ -163,6 +198,7 @@ export const SongWhereUnique = t.Recursive(
               albumCover: t.String(),
               duration: t.Integer(),
               audioId: t.String(),
+              categoryId: t.String(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
             },
@@ -186,6 +222,8 @@ export const SongSelect = t.Partial(
       duration: t.Boolean(),
       audioId: t.Boolean(),
       audio: t.Boolean(),
+      categoryId: t.Boolean(),
+      category: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
       _count: t.Boolean(),
@@ -196,7 +234,7 @@ export const SongSelect = t.Partial(
 
 export const SongInclude = t.Partial(
   t.Object(
-    { audio: t.Boolean(), _count: t.Boolean() },
+    { audio: t.Boolean(), category: t.Boolean(), _count: t.Boolean() },
     { additionalProperties: false },
   ),
 );
@@ -223,6 +261,9 @@ export const SongOrderBy = t.Partial(
         additionalProperties: false,
       }),
       audioId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      categoryId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {

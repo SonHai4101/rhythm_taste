@@ -4,20 +4,14 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const AudioPlain = t.Object(
-  {
-    id: t.String(),
-    url: t.String(),
-    key: t.String(),
-    createdAt: t.Date(),
-    updatedAt: t.Date(),
-  },
+export const CategoryPlain = t.Object(
+  { id: t.String(), name: t.String() },
   { additionalProperties: false },
 );
 
-export const AudioRelations = t.Object(
+export const CategoryRelations = t.Object(
   {
-    song: __nullable__(
+    song: t.Array(
       t.Object(
         {
           id: t.String(),
@@ -33,30 +27,34 @@ export const AudioRelations = t.Object(
         },
         { additionalProperties: false },
       ),
+      { additionalProperties: false },
     ),
   },
   { additionalProperties: false },
 );
 
-export const AudioPlainInputCreate = t.Object(
-  { url: t.String(), key: t.String() },
+export const CategoryPlainInputCreate = t.Object(
+  { name: t.String() },
   { additionalProperties: false },
 );
 
-export const AudioPlainInputUpdate = t.Object(
-  { url: t.Optional(t.String()), key: t.Optional(t.String()) },
+export const CategoryPlainInputUpdate = t.Object(
+  { name: t.Optional(t.String()) },
   { additionalProperties: false },
 );
 
-export const AudioRelationsInputCreate = t.Object(
+export const CategoryRelationsInputCreate = t.Object(
   {
     song: t.Optional(
       t.Object(
         {
-          connect: t.Object(
-            {
-              id: t.String({ additionalProperties: false }),
-            },
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
             { additionalProperties: false },
           ),
         },
@@ -67,19 +65,30 @@ export const AudioRelationsInputCreate = t.Object(
   { additionalProperties: false },
 );
 
-export const AudioRelationsInputUpdate = t.Partial(
+export const CategoryRelationsInputUpdate = t.Partial(
   t.Object(
     {
       song: t.Partial(
         t.Object(
           {
-            connect: t.Object(
-              {
-                id: t.String({ additionalProperties: false }),
-              },
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
               { additionalProperties: false },
             ),
-            disconnect: t.Boolean(),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
           },
           { additionalProperties: false },
         ),
@@ -89,7 +98,7 @@ export const AudioRelationsInputUpdate = t.Partial(
   ),
 );
 
-export const AudioWhere = t.Partial(
+export const CategoryWhere = t.Partial(
   t.Recursive(
     (Self) =>
       t.Object(
@@ -98,28 +107,29 @@ export const AudioWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.String(),
-          url: t.String(),
-          key: t.String(),
-          createdAt: t.Date(),
-          updatedAt: t.Date(),
+          name: t.String(),
         },
         { additionalProperties: false },
       ),
-    { $id: "Audio" },
+    { $id: "Category" },
   ),
 );
 
-export const AudioWhereUnique = t.Recursive(
+export const CategoryWhereUnique = t.Recursive(
   (Self) =>
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.String() }, { additionalProperties: false }),
+          t.Object(
+            { id: t.String(), name: t.String() },
+            { additionalProperties: false },
+          ),
           { additionalProperties: false },
         ),
-        t.Union([t.Object({ id: t.String() })], {
-          additionalProperties: false,
-        }),
+        t.Union(
+          [t.Object({ id: t.String() }), t.Object({ name: t.String() })],
+          { additionalProperties: false },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([
@@ -136,60 +146,42 @@ export const AudioWhereUnique = t.Recursive(
         ),
         t.Partial(
           t.Object(
-            {
-              id: t.String(),
-              url: t.String(),
-              key: t.String(),
-              createdAt: t.Date(),
-              updatedAt: t.Date(),
-            },
+            { id: t.String(), name: t.String() },
             { additionalProperties: false },
           ),
         ),
       ],
       { additionalProperties: false },
     ),
-  { $id: "Audio" },
+  { $id: "Category" },
 );
 
-export const AudioSelect = t.Partial(
+export const CategorySelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      url: t.Boolean(),
-      key: t.Boolean(),
+      name: t.Boolean(),
       song: t.Boolean(),
-      createdAt: t.Boolean(),
-      updatedAt: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
   ),
 );
 
-export const AudioInclude = t.Partial(
+export const CategoryInclude = t.Partial(
   t.Object(
     { song: t.Boolean(), _count: t.Boolean() },
     { additionalProperties: false },
   ),
 );
 
-export const AudioOrderBy = t.Partial(
+export const CategoryOrderBy = t.Partial(
   t.Object(
     {
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      url: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      key: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      updatedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      name: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },
@@ -197,16 +189,16 @@ export const AudioOrderBy = t.Partial(
   ),
 );
 
-export const Audio = t.Composite([AudioPlain, AudioRelations], {
+export const Category = t.Composite([CategoryPlain, CategoryRelations], {
   additionalProperties: false,
 });
 
-export const AudioInputCreate = t.Composite(
-  [AudioPlainInputCreate, AudioRelationsInputCreate],
+export const CategoryInputCreate = t.Composite(
+  [CategoryPlainInputCreate, CategoryRelationsInputCreate],
   { additionalProperties: false },
 );
 
-export const AudioInputUpdate = t.Composite(
-  [AudioPlainInputUpdate, AudioRelationsInputUpdate],
+export const CategoryInputUpdate = t.Composite(
+  [CategoryPlainInputUpdate, CategoryRelationsInputUpdate],
   { additionalProperties: false },
 );
