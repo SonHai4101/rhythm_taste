@@ -24,6 +24,17 @@ export const categoryPlugin = new Elysia({
       }),
     },
   )
+  .get(
+    "/:id",
+    async ({ params, getCategoryById }) => {
+      return getCategoryById(params.id);
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+    },
+  )
   .delete(
     "/:id",
     async ({ params, deleteCategory }) => {

@@ -31,6 +31,26 @@ export const categoryService = new Elysia().derive(
       }
     };
 
+    const getCategoryById = async (id: string) => {
+      try {
+        const category = await db.category.findUnique({
+          where: { id },
+        });
+        if (!category) {
+          throw status(404, {
+            success: false,
+            message: "Category not found",
+          });
+        }
+        return category;
+      } catch (error: any) {
+        throw status(500, {
+          success: false,
+          message: `Failed to fetch category: ${error.message}`,
+        });
+      }
+    };
+
     const deleteCategory = async (categoryId: string) => {
       try {
         const category = await db.category.findUnique({
@@ -56,6 +76,7 @@ export const categoryService = new Elysia().derive(
     return {
       getCategories,
       createCategory,
+      getCategoryById,
       deleteCategory,
     };
   },
