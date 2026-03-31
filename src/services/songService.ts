@@ -9,7 +9,7 @@ export const songService = new Elysia().derive(
     const createSong = async (
       data: Omit<Prisma.SongCreateInput, "audio"> & {
         audioId: string;
-      }
+      },
     ) => {
       try {
         const song = await db.song.create({
@@ -30,6 +30,50 @@ export const songService = new Elysia().derive(
         throw status(400, {
           success: false,
           message: `Failed to create song: ${error.message}`,
+        });
+      }
+    };
+
+    const updateSong = async (
+      id: string,
+      data: {
+        title?: string;
+        artist?: string | null;
+        album?: string | null;
+        albumCover?: string | null;
+        duration?: number | null;
+        categoryId?: string;
+      },
+    ) => {
+      try {
+        const existingSong = await db.song.findUnique({ where: { id } });
+        if (!existingSong) {
+          throw status(404, { success: false, message: "Song not found" });
+        }
+
+        let categoryId = existingSong.categoryId;
+        if (data.categoryId !== undefined) {
+          const categoryExists = await db.category.findUnique({
+            where: { id: data.categoryId },
+          });
+          if (categoryExists) categoryId = data.categoryId;
+        }
+
+        return await db.song.update({
+          where: { id },
+          data: {
+            title: data.title,
+            artist: data.artist,
+            album: data.album,
+            albumCover: data.albumCover,
+            duration: data.duration,
+            categoryId,
+          },
+        });
+      } catch (error: any) {
+        throw status(400, {
+          success: false,
+          message: `Failed to update song: ${error.message}`,
         });
       }
     };
@@ -71,12 +115,15 @@ export const songService = new Elysia().derive(
           skip,
           take: limit,
         });
-        return {data, pagination: {
+        return {
+          data,
+          pagination: {
             total,
             page,
             limit,
             totalPages: Math.ceil(total / limit),
-          },};
+          },
+        };
       } catch (error: any) {
         throw status(400, {
           success: false,
@@ -243,9 +290,9 @@ export const songService = new Elysia().derive(
       createSong,
       getAllSongs,
       getSongById,
-      //   updateSong,
+      updateSong,
       deleteSong,
       searchSongs,
     };
-  }
+  },
 );

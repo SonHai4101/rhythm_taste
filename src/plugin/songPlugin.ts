@@ -1,10 +1,7 @@
 import Elysia, { t } from "elysia";
 import { authService } from "../services/authService";
 import { songService } from "../services/songService";
-import {
-  SongPlainInputCreate,
-  SongPlainInputUpdate,
-} from "../../generated/prismabox/Song";
+import { SongPlainInputCreate } from "../../generated/prismabox/Song";
 
 export const songPlugin = new Elysia({
   name: "Plugin.Song",
@@ -72,6 +69,26 @@ export const songPlugin = new Elysia({
     {
       params: t.Object({
         id: t.String(),
+      }),
+    },
+  )
+  // Update song
+  .put(
+    "/:id",
+    async ({ params, body, updateSong }) => {
+      return updateSong(params.id, body);
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: t.Object({
+        title: t.Optional(t.String()),
+        artist: t.Optional(t.Nullable(t.String())),
+        album: t.Optional(t.Nullable(t.String())),
+        albumCover: t.Optional(t.Nullable(t.String())),
+        duration: t.Optional(t.Nullable(t.Number())),
+        categoryId: t.Optional(t.String()),
       }),
     },
   )
