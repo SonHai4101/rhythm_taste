@@ -11,29 +11,34 @@ const s3 = cloudflare({
   secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
 });
 
+const audioPublicBaseUrl = process.env.AUDIO_R2_PUBLIC_URL ?? process.env.R2_PUBLIC_URL!;
+const imagePublicBaseUrl =
+  process.env.IMAGE_R2_PUBLIC_URL ??
+  process.env.AUDIO_R2_PUBLIC_URL ??
+  process.env.R2_PUBLIC_URL!;
+
 const router: Router = {
-  client: s3, // or cloudflare(), backblaze(), tigris(), ...
+  client: s3,
   bucketName: process.env.R2_BUCKET_NAME!,
   routes: {
     audio: route({
-      multipleFiles: true, // Enable multiple file uploads
-      maxFiles: 10, // Maximum 10 files at once (default is 3)
+      multipleFiles: true,
+      maxFiles: 10,
       fileTypes: ["audio/mpeg"],
       maxFileSize: 100 * 1024 * 1024,
       onAfterSignedUrl: async ({ files }) => {
-        // Create Audio records for all uploaded files
         await Promise.all(
           files.map(async (file) => {
             const key = file.objectInfo.key;
-            const publicUrl = `${process.env.AUDIO_R2_PUBLIC_URL}/${key}`;
+            const publicUrl = `${audioPublicBaseUrl}/${key}`;
 
             await prisma.audio.create({
               data: {
-                key: key,
+                key,
                 url: publicUrl,
               },
             });
-          })
+          }),
         );
       },
     }),
@@ -45,33 +50,32 @@ const router: Router = {
       clientMetadataSchema: z.object({
         songId: z.string(),
       }),
-
       onAfterSignedUrl: async ({ files, clientMetadata }) => {
-        const songId = clientMetadata.songId
+        const songId = clientMetadata.songId;
 
-        if(!songId) {
+        if (!songId) {
           throw new Error("SongId is required in metadata for image upload");
         }
 
         await Promise.all(
           files.map(async (file) => {
-            const key  = file.objectInfo.key;
-            const publicUrl = `${process.env.AUDIO_R2_PUBLIC_URL}/${key}`
+            const key = file.objectInfo.key;
+            const publicUrl = `${imagePublicBaseUrl}/${key}`;
 
             await prisma.albumCover.create({
               data: {
-                key: key,
+                key,
                 url: publicUrl,
-                songId
-              }
-            })
-          })
-        )
-      }
+                songId,
+              },
+            });
+          }),
+        );
+      },
     }),
   },
 };
- 
+
 export const betterUploadPlugin = new Elysia({
   name: "Plugin.BetterUpload",
   prefix: "/upload",

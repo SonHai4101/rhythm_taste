@@ -1,30 +1,53 @@
 import Elysia from "elysia";
-import { Prisma } from "../generated/prisma/client";
 import db from "../db";
+
+type CreateSongInput = {
+  title: string;
+  artist?: string | null;
+  album?: string | null;
+  albumCoverIds?: string[];
+  duration?: number | null;
+  audioId: string;
+};
+
+type UpdateSongInput = {
+  title?: string;
+  artist?: string | null;
+  album?: string | null;
+  albumCoverIds?: string[];
+  duration?: number | null;
+  categoryId?: string | null;
+};
+
+const songInclude = {
+  albumCover: true,
+  audio: true,
+  category: true,
+} as const;
 
 export const songService = new Elysia().derive(
   { as: "scoped" },
   ({ status }) => {
-    // Create a new song
-    const createSong = async (
-      data: Omit<Prisma.SongCreateInput, "audio"> & {
-        audioId: string;
-      },
-    ) => {
+    const createSong = async (data: CreateSongInput) => {
       try {
         const song = await db.song.create({
           data: {
             title: data.title,
             artist: data.artist,
             album: data.album,
-            albumCover: data.albumCover,
             duration: data.duration,
             audioId: data.audioId,
+            ...(data.albumCoverIds?.length
+              ? {
+                  albumCover: {
+                    connect: data.albumCoverIds.map((id) => ({ id })),
+                  },
+                }
+              : {}),
           },
-          include: {
-            audio: true,
-          },
+          include: songInclude,
         });
+
         return song;
       } catch (error: any) {
         throw status(400, {
@@ -34,17 +57,7 @@ export const songService = new Elysia().derive(
       }
     };
 
-    const updateSong = async (
-      id: string,
-      data: {
-        title?: string;
-        artist?: string | null;
-        album?: string | null;
-        albumCover?: string | null;
-        duration?: number | null;
-        categoryId?: string;
-      },
-    ) => {
+    const updateSong = async (id: string, data: UpdateSongInput) => {
       try {
         const existingSong = await db.song.findUnique({ where: { id } });
         if (!existingSong) {
@@ -53,10 +66,16 @@ export const songService = new Elysia().derive(
 
         let categoryId = existingSong.categoryId;
         if (data.categoryId !== undefined) {
-          const categoryExists = await db.category.findUnique({
-            where: { id: data.categoryId },
-          });
-          if (categoryExists) categoryId = data.categoryId;
+          if (data.categoryId === null) {
+            categoryId = null;
+          } else {
+            const categoryExists = await db.category.findUnique({
+              where: { id: data.categoryId },
+            });
+            if (categoryExists) {
+              categoryId = data.categoryId;
+            }
+          }
         }
 
         return await db.song.update({
@@ -65,10 +84,17 @@ export const songService = new Elysia().derive(
             title: data.title,
             artist: data.artist,
             album: data.album,
-            albumCover: data.albumCover,
             duration: data.duration,
             categoryId,
+            ...(data.albumCoverIds !== undefined
+              ? {
+                  albumCover: {
+                    set: data.albumCoverIds.map((coverId) => ({ id: coverId })),
+                  },
+                }
+              : {}),
           },
+          include: songInclude,
         });
       } catch (error: any) {
         throw status(400, {
@@ -78,7 +104,6 @@ export const songService = new Elysia().derive(
       }
     };
 
-    // Get all songs
     const getAllSongs = async (params: {
       page: number;
       limit: number;
@@ -90,31 +115,29 @@ export const songService = new Elysia().derive(
         const skip = (page - 1) * limit;
 
         const whereConditions: any[] = [];
-        if (artist)
+        if (artist) {
           whereConditions.push({
             artist: { contains: artist, mode: "insensitive" },
           });
-        if (album)
+        }
+        if (album) {
           whereConditions.push({
             album: { contains: album, mode: "insensitive" },
           });
-        const where =
-          whereConditions.length > 0 ? { AND: whereConditions } : {};
+        }
+        const where = whereConditions.length > 0 ? { AND: whereConditions } : {};
 
-        // Get total count for pagination
         const total = await db.song.count({ where });
-
         const data = await db.song.findMany({
           where,
-          include: {
-            audio: true,
-          },
+          include: songInclude,
           orderBy: {
             createdAt: "desc",
           },
           skip,
           take: limit,
         });
+
         return {
           data,
           pagination: {
@@ -132,14 +155,11 @@ export const songService = new Elysia().derive(
       }
     };
 
-    // Get song by ID
     const getSongById = async (id: string) => {
       try {
         const song = await db.song.findUnique({
           where: { id },
-          include: {
-            audio: true,
-          },
+          include: songInclude,
         });
         if (!song) {
           throw status(404, {
@@ -157,74 +177,6 @@ export const songService = new Elysia().derive(
       }
     };
 
-    // Update song
-    // const updateSong = async (
-    //   id: string,
-    //   data: Partial<Omit<Prisma.SongUpdateInput, "audio">> & {
-    //     audioUrl?: string;
-    //     audioKey?: string;
-    //   }
-    // ) => {
-    //   try {
-    //     const existingSong = await db.song.findUnique({
-    //       where: { id },
-    //       include: { audio: true },
-    //     });
-
-    //     if (!existingSong) {
-    //       throw status(404, {
-    //         success: false,
-    //         message: "Song not found",
-    //       });
-    //     }
-
-    //     const updateData: any = {
-    //       ...(data.title && { title: data.title }),
-    //       ...(data.artist !== undefined && { artist: data.artist }),
-    //       ...(data.album !== undefined && { album: data.album }),
-    //       ...(data.duration !== undefined && { duration: data.duration }),
-    //     };
-
-    //     // Handle audio update
-    //     if (data.audioUrl && data.audioKey) {
-    //       if (existingSong.audio) {
-    //         // Update existing audio
-    //         updateData.audio = {
-    //           update: {
-    //             url: data.audioUrl,
-    //             key: data.audioKey,
-    //           },
-    //         };
-    //       } else {
-    //         // Create new audio
-    //         updateData.audio = {
-    //           create: {
-    //             url: data.audioUrl,
-    //             key: data.audioKey,
-    //           },
-    //         };
-    //       }
-    //     }
-
-    //     const updatedSong = await db.song.update({
-    //       where: { id },
-    //       data: updateData,
-    //       include: {
-    //         audio: true,
-    //       },
-    //     });
-
-    //     return updatedSong;
-    //   } catch (error: any) {
-    //     if (error.status === 404) throw error;
-    //     throw status(400, {
-    //       success: false,
-    //       message: `Failed to update song: ${error.message}`,
-    //     });
-    //   }
-    // };
-
-    // Delete song
     const deleteSong = async (id: string) => {
       try {
         const song = await db.song.findUnique({
@@ -239,7 +191,6 @@ export const songService = new Elysia().derive(
           });
         }
 
-        // Delete the song (audio will be deleted automatically due to cascade)
         await db.song.delete({
           where: { id },
         });
@@ -247,8 +198,8 @@ export const songService = new Elysia().derive(
         return {
           success: true,
           message: "Song deleted successfully",
-          audioId: song.audio?.id, // Return audio ID so caller can delete from storage
-          audioKey: song.audio?.key, // Return R2 key for storage deletion
+          audioId: song.audio?.id,
+          audioKey: song.audio?.key,
         };
       } catch (error: any) {
         if (error.status === 404) throw error;
@@ -259,7 +210,6 @@ export const songService = new Elysia().derive(
       }
     };
 
-    // Search songs by title or artist
     const searchSongs = async (query: string) => {
       try {
         const songs = await db.song.findMany({
@@ -270,9 +220,7 @@ export const songService = new Elysia().derive(
               { album: { contains: query, mode: "insensitive" } },
             ],
           },
-          include: {
-            audio: true,
-          },
+          include: songInclude,
           orderBy: {
             createdAt: "desc",
           },

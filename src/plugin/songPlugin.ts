@@ -1,7 +1,6 @@
 import Elysia, { t } from "elysia";
 import { authService } from "../services/authService";
 import { songService } from "../services/songService";
-import { SongPlainInputCreate } from "../../generated/prismabox/Song";
 
 export const songPlugin = new Elysia({
   name: "Plugin.Song",
@@ -11,7 +10,6 @@ export const songPlugin = new Elysia({
   .use(authService)
   .use(songService)
   .guard({ isSignIn: true })
-  // Get all songs
   .get(
     "/",
     async ({ query, getAllSongs }) => {
@@ -31,7 +29,6 @@ export const songPlugin = new Elysia({
       }),
     },
   )
-  // Create a new song
   .post(
     "/",
     async ({ body, createSong }) => {
@@ -42,13 +39,12 @@ export const songPlugin = new Elysia({
         title: t.String(),
         artist: t.Optional(t.Union([t.String(), t.Null()])),
         album: t.Optional(t.Union([t.String(), t.Null()])),
-        albumCover: t.Optional(t.Union([t.String(), t.Null()])),
+        albumCoverIds: t.Optional(t.Array(t.String())),
         duration: t.Optional(t.Union([t.Number(), t.Null()])),
         audioId: t.String(),
       }),
     },
   )
-  // Search songs by query
   .get(
     "/search",
     async ({ query, searchSongs }) => {
@@ -60,7 +56,6 @@ export const songPlugin = new Elysia({
       }),
     },
   )
-  // Get song by ID
   .get(
     "/:id",
     async ({ params, getSongById }) => {
@@ -72,7 +67,6 @@ export const songPlugin = new Elysia({
       }),
     },
   )
-  // Update song
   .put(
     "/:id",
     async ({ params, body, updateSong }) => {
@@ -86,32 +80,12 @@ export const songPlugin = new Elysia({
         title: t.Optional(t.String()),
         artist: t.Optional(t.Nullable(t.String())),
         album: t.Optional(t.Nullable(t.String())),
-        albumCover: t.Optional(t.Nullable(t.String())),
+        albumCoverIds: t.Optional(t.Array(t.String())),
         duration: t.Optional(t.Nullable(t.Number())),
-        categoryId: t.Optional(t.String()),
+        categoryId: t.Optional(t.Union([t.String(), t.Null()])),
       }),
     },
   )
-  // Update song
-  // .put(
-  //   "/:id",
-  //   async ({ params, body, updateSong }) => {
-  //     return updateSong(params.id, body);
-  //   },
-  //   {
-  //     params: t.Object({
-  //       id: t.String(),
-  //     }),
-  //     body: t.Intersect([
-  //       SongPlainInputUpdate,
-  //       t.Object({
-  //         audioUrl: t.Optional(t.String()),
-  //         audioKey: t.Optional(t.String()),
-  //       }),
-  //     ]),
-  //   }
-  // )
-  // Delete song
   .delete(
     "/:id",
     async ({ params, deleteSong }) => {
