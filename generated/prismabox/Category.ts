@@ -18,7 +18,6 @@ export const CategoryRelations = t.Object(
           title: t.String(),
           artist: __nullable__(t.String()),
           album: __nullable__(t.String()),
-          albumCover: __nullable__(t.String()),
           duration: __nullable__(t.Integer()),
           audioId: __nullable__(t.String()),
           categoryId: __nullable__(t.String()),

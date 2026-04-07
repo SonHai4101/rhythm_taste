@@ -1,6 +1,7 @@
 import Elysia from "elysia";
 import { handleRequest, route, type Router } from "@better-upload/server";
 import { cloudflare } from "@better-upload/server/clients";
+import { z } from "zod";
 import { authService } from "../services/authService";
 import prisma from "../db";
 
@@ -35,6 +36,38 @@ const router: Router = {
           })
         );
       },
+    }),
+    image: route({
+      multipleFiles: true,
+      maxFiles: 5,
+      fileTypes: ["image/jpeg", "image/png", "image/webp"],
+      maxFileSize: 10 * 1024 * 1024,
+      clientMetadataSchema: z.object({
+        songId: z.string(),
+      }),
+
+      onAfterSignedUrl: async ({ files, clientMetadata }) => {
+        const songId = clientMetadata.songId
+
+        if(!songId) {
+          throw new Error("SongId is required in metadata for image upload");
+        }
+
+        await Promise.all(
+          files.map(async (file) => {
+            const key  = file.objectInfo.key;
+            const publicUrl = `${process.env.AUDIO_R2_PUBLIC_URL}/${key}`
+
+            await prisma.albumCover.create({
+              data: {
+                key: key,
+                url: publicUrl,
+                songId
+              }
+            })
+          })
+        )
+      }
     }),
   },
 };

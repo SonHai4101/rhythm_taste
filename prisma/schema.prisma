@@ -37,20 +37,33 @@ model User {
 }
 
 model Song {
-  id         String  @id @default(cuid())
+  id         String       @id @default(cuid())
   title      String
   artist     String?
   album      String?
-  albumCover String?
+  albumCover AlbumCover[]
   duration   Int? // seconds
-  audioId    String? @unique
-  audio      Audio?  @relation(fields: [audioId], references: [id], onDelete: Cascade)
+  audioId    String?      @unique
+  audio      Audio?       @relation(fields: [audioId], references: [id], onDelete: Cascade)
 
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AlbumCover {
+  id     String @id @default(cuid())
+  key    String
+  url    String
+  songId String
+  song   Song   @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("album_covers")
 }
 
 model Category {

@@ -4,53 +4,69 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const AudioPlain = t.Object(
+export const AlbumCoverPlain = t.Object(
   {
     id: t.String(),
-    url: t.String(),
     key: t.String(),
+    url: t.String(),
+    songId: t.String(),
     createdAt: t.Date(),
     updatedAt: t.Date(),
   },
   { additionalProperties: false },
 );
 
-export const AudioRelations = t.Object(
+export const AlbumCoverRelations = t.Object(
   {
-    song: __nullable__(
-      t.Object(
-        {
-          id: t.String(),
-          title: t.String(),
-          artist: __nullable__(t.String()),
-          album: __nullable__(t.String()),
-          duration: __nullable__(t.Integer()),
-          audioId: __nullable__(t.String()),
-          categoryId: __nullable__(t.String()),
-          createdAt: t.Date(),
-          updatedAt: t.Date(),
-        },
-        { additionalProperties: false },
-      ),
+    song: t.Object(
+      {
+        id: t.String(),
+        title: t.String(),
+        artist: __nullable__(t.String()),
+        album: __nullable__(t.String()),
+        duration: __nullable__(t.Integer()),
+        audioId: __nullable__(t.String()),
+        categoryId: __nullable__(t.String()),
+        createdAt: t.Date(),
+        updatedAt: t.Date(),
+      },
+      { additionalProperties: false },
     ),
   },
   { additionalProperties: false },
 );
 
-export const AudioPlainInputCreate = t.Object(
-  { url: t.String(), key: t.String() },
+export const AlbumCoverPlainInputCreate = t.Object(
+  { key: t.String(), url: t.String() },
   { additionalProperties: false },
 );
 
-export const AudioPlainInputUpdate = t.Object(
-  { url: t.Optional(t.String()), key: t.Optional(t.String()) },
+export const AlbumCoverPlainInputUpdate = t.Object(
+  { key: t.Optional(t.String()), url: t.Optional(t.String()) },
   { additionalProperties: false },
 );
 
-export const AudioRelationsInputCreate = t.Object(
+export const AlbumCoverRelationsInputCreate = t.Object(
   {
-    song: t.Optional(
-      t.Object(
+    song: t.Object(
+      {
+        connect: t.Object(
+          {
+            id: t.String({ additionalProperties: false }),
+          },
+          { additionalProperties: false },
+        ),
+      },
+      { additionalProperties: false },
+    ),
+  },
+  { additionalProperties: false },
+);
+
+export const AlbumCoverRelationsInputUpdate = t.Partial(
+  t.Object(
+    {
+      song: t.Object(
         {
           connect: t.Object(
             {
@@ -61,34 +77,12 @@ export const AudioRelationsInputCreate = t.Object(
         },
         { additionalProperties: false },
       ),
-    ),
-  },
-  { additionalProperties: false },
-);
-
-export const AudioRelationsInputUpdate = t.Partial(
-  t.Object(
-    {
-      song: t.Partial(
-        t.Object(
-          {
-            connect: t.Object(
-              {
-                id: t.String({ additionalProperties: false }),
-              },
-              { additionalProperties: false },
-            ),
-            disconnect: t.Boolean(),
-          },
-          { additionalProperties: false },
-        ),
-      ),
     },
     { additionalProperties: false },
   ),
 );
 
-export const AudioWhere = t.Partial(
+export const AlbumCoverWhere = t.Partial(
   t.Recursive(
     (Self) =>
       t.Object(
@@ -97,18 +91,19 @@ export const AudioWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.String(),
-          url: t.String(),
           key: t.String(),
+          url: t.String(),
+          songId: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
         { additionalProperties: false },
       ),
-    { $id: "Audio" },
+    { $id: "AlbumCover" },
   ),
 );
 
-export const AudioWhereUnique = t.Recursive(
+export const AlbumCoverWhereUnique = t.Recursive(
   (Self) =>
     t.Intersect(
       [
@@ -137,8 +132,9 @@ export const AudioWhereUnique = t.Recursive(
           t.Object(
             {
               id: t.String(),
-              url: t.String(),
               key: t.String(),
+              url: t.String(),
+              songId: t.String(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
             },
@@ -148,15 +144,16 @@ export const AudioWhereUnique = t.Recursive(
       ],
       { additionalProperties: false },
     ),
-  { $id: "Audio" },
+  { $id: "AlbumCover" },
 );
 
-export const AudioSelect = t.Partial(
+export const AlbumCoverSelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      url: t.Boolean(),
       key: t.Boolean(),
+      url: t.Boolean(),
+      songId: t.Boolean(),
       song: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
@@ -166,23 +163,26 @@ export const AudioSelect = t.Partial(
   ),
 );
 
-export const AudioInclude = t.Partial(
+export const AlbumCoverInclude = t.Partial(
   t.Object(
     { song: t.Boolean(), _count: t.Boolean() },
     { additionalProperties: false },
   ),
 );
 
-export const AudioOrderBy = t.Partial(
+export const AlbumCoverOrderBy = t.Partial(
   t.Object(
     {
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
+      key: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
       url: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      key: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      songId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
@@ -196,16 +196,16 @@ export const AudioOrderBy = t.Partial(
   ),
 );
 
-export const Audio = t.Composite([AudioPlain, AudioRelations], {
+export const AlbumCover = t.Composite([AlbumCoverPlain, AlbumCoverRelations], {
   additionalProperties: false,
 });
 
-export const AudioInputCreate = t.Composite(
-  [AudioPlainInputCreate, AudioRelationsInputCreate],
+export const AlbumCoverInputCreate = t.Composite(
+  [AlbumCoverPlainInputCreate, AlbumCoverRelationsInputCreate],
   { additionalProperties: false },
 );
 
-export const AudioInputUpdate = t.Composite(
-  [AudioPlainInputUpdate, AudioRelationsInputUpdate],
+export const AlbumCoverInputUpdate = t.Composite(
+  [AlbumCoverPlainInputUpdate, AlbumCoverRelationsInputUpdate],
   { additionalProperties: false },
 );

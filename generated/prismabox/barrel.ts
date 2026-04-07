@@ -1,6 +1,7 @@
 export * from "./ROLE";
 export * from "./User";
 export * from "./Song";
+export * from "./AlbumCover";
 export * from "./Category";
 export * from "./Audio";
 export * from "./__nullable__";
